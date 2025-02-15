@@ -85,6 +85,9 @@ export function Sidebar() {
                     isCollapsed ? "justify-center p-2" : "px-4 py-2"
                   )}
                   title={isCollapsed ? item.label : undefined}
+                  onClick={() => {
+                    if (!isCollapsed) setIsCollapsed(true);
+                  }}
                 >
                   <item.icon
                     className={cn(

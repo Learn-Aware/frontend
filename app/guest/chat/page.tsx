@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
@@ -12,6 +14,7 @@ import {
 } from "@/src/components/ui/avatar";
 import { Textarea } from "@/src/components/ui/textarea";
 import { agentChat } from "@/src/services/socraticServices";
+import { useUser } from "@clerk/nextjs";
 
 const getCurrentTime = () =>
   new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
@@ -30,6 +33,7 @@ interface ISession {
 }
 
 const ChatPage = () => {
+  const { user } = useUser();
   const [sessions, setSessions] = useState<ISession[]>([]);
   const [currentSessionId, setCurrentSessionId] = useState<string>("");
   const [userInput, setUserInput] = useState("");
@@ -86,7 +90,7 @@ const ChatPage = () => {
       setStreamingText("");
       for (let i = 0; i < response.question.length; i++) {
         setStreamingText((prev) => prev + response.question[i]);
-        await new Promise((resolve) => setTimeout(resolve, 30));
+        await new Promise((resolve) => setTimeout(resolve, 10));
       }
 
       const botMessage = {
@@ -196,9 +200,18 @@ const ChatPage = () => {
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         } transition-transform duration-300 sm:translate-x-0 w-64`}
       >
-        <h3 className="text-lg font-semibold p-4 border-b bg-gray-50 text-gray-800">
-          Chat History
-        </h3>
+        <div className="flex items-center justify-start ml-4">
+          <Image
+            src="/images/logo.png"
+            alt="LAAI"
+            width={40}
+            height={40}
+            className="animate-pulse"
+          />
+          <h3 className="text-lg font-semibold p-4 text-gray-800">
+            Chat History
+          </h3>
+        </div>
 
         <div className="flex items-center justify-center space-x-3 px-4 py-2 bg-gray-50 border-b">
           {["Science", "Maths", "History"].map((category) => (
@@ -304,11 +317,19 @@ const ChatPage = () => {
 
               {message.sender === "user" && (
                 <Avatar className="ml-2">
-                  <AvatarImage
-                    src="/images/userAvatar.svg"
-                    alt="User"
-                    className="w-8 h-8 object-cover"
-                  />
+                  {user?.imageUrl ? (
+                    <img
+                      src={user?.imageUrl}
+                      alt="User Profile"
+                      className="w-8 h-8 rounded-full object-cover"
+                    />
+                  ) : (
+                    <AvatarImage
+                      src="/images/userAvatar.svg"
+                      alt="User"
+                      className="w-8 h-8 object-cover"
+                    />
+                  )}
                 </Avatar>
               )}
             </div>
@@ -325,7 +346,7 @@ const ChatPage = () => {
                 />
                 <AvatarFallback>🤖</AvatarFallback>
               </Avatar>
-              <div className="flex flex-col max-w-md">
+              <div className="flex flex-col max-w-md mb-8">
                 <Card className="px-4 py-2 shadow-lg bg-gradient-to-r from-gray-200 to-gray-100 text-gray-800 rounded-3xl rounded-bl-sm mr-2">
                   {streamingText || "Thinking..."}
                 </Card>
@@ -340,7 +361,7 @@ const ChatPage = () => {
         <div className="flex flex-col px-4 py-3 bg-gray-50 border border-gray-200 shadow-md rounded-2xl space-y-4">
           <Textarea
             placeholder="Type your message here..."
-            className="w-full border-none p-4 focus:ring-2 focus:ring-blue-500 rounded-lg"
+            className="w-full border-none p-2 focus:ring-2 focus:ring-blue-500 rounded-lg"
             value={userInput}
             onChange={(e) => setUserInput(e.target.value)}
             disabled={loading}
