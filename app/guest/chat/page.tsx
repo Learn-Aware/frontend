@@ -2,16 +2,16 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
-import { Button } from "../../../components/ui/button";
-import { ScrollArea } from "../../../components/ui/scroll-area";
-import { Card } from "../../../components/ui/card";
+import { Button } from "@/src/components/ui/button";
+import { ScrollArea } from "@/src/components/ui/scroll-area";
+import { Card } from "@/src/components/ui/card";
 import {
   Avatar,
   AvatarFallback,
   AvatarImage,
-} from "../../../components/ui/avatar";
-import { Textarea } from "../../../components/ui/textarea";
-import { agentChat } from "../../../services/socraticServices";
+} from "@/src/components/ui/avatar";
+import { Textarea } from "@/src/components/ui/textarea";
+import { agentChat } from "@/src/services/socraticServices";
 
 const getCurrentTime = () =>
   new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
