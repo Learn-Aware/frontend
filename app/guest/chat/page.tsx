@@ -90,7 +90,7 @@ const ChatPage = () => {
       setStreamingText("");
       for (let i = 0; i < response.question.length; i++) {
         setStreamingText((prev) => prev + response.question[i]);
-        await new Promise((resolve) => setTimeout(resolve, 30));
+        await new Promise((resolve) => setTimeout(resolve, 10));
       }
 
       const botMessage = {
@@ -346,7 +346,7 @@ const ChatPage = () => {
                 />
                 <AvatarFallback>🤖</AvatarFallback>
               </Avatar>
-              <div className="flex flex-col max-w-md">
+              <div className="flex flex-col max-w-md mb-8">
                 <Card className="px-4 py-2 shadow-lg bg-gradient-to-r from-gray-200 to-gray-100 text-gray-800 rounded-3xl rounded-bl-sm mr-2">
                   {streamingText || "Thinking..."}
                 </Card>
