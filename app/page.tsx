@@ -5,10 +5,24 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Button } from "@/src/components/ui";
 import LAAILoading from "@/src/components/common/LAAILoading";
+import { registerUser, IRegisterRequest } from "@/src/services/userService";
+import { useEffect } from "react";
 
 export default function Home() {
   const { user, isLoaded } = useUser();
   const router = useRouter();
+
+  useEffect(() => {
+    if (user) {
+      const registerRequest: IRegisterRequest = {
+        email: user.emailAddresses[0].emailAddress,
+        first_name: user.firstName || "User",
+        last_name: user.lastName || "User",
+        profile_image: user.imageUrl || "",
+      };
+      registerUser(registerRequest);
+    }
+  }, [user]);
 
   const handleNavigation = (role: "guest" | "student" | "api") => {
     router.push(`/${role}`);
