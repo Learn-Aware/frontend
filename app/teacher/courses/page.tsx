@@ -14,7 +14,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-} from "../../../components/ui";
+} from "@/src/components/ui";
 
 export default function TeacherCourses() {
   const [pdfFiles, setPdfFiles] = useState<File[]>([]);
