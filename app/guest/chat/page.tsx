@@ -2,7 +2,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { Button } from "@/src/components/ui/button";
 import { ScrollArea } from "@/src/components/ui/scroll-area";
@@ -15,6 +15,7 @@ import {
 import { Textarea } from "@/src/components/ui/textarea";
 import { agentChat } from "@/src/services/socraticServices";
 import { useUser } from "@clerk/nextjs";
+import { saveConversations } from "@/src/services/conversationService";
 
 const getCurrentTime = () =>
   new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
@@ -27,14 +28,19 @@ interface IMessage {
   image: string | null;
 }
 
-interface ISession {
+interface IConversation {
   id: string;
   messages: IMessage[];
 }
 
+export interface IConversationRequest {
+  user_email: string;
+  conversations: IConversation[];
+}
+
 const ChatPage = () => {
   const { user } = useUser();
-  const [sessions, setSessions] = useState<ISession[]>([]);
+  const [sessions, setSessions] = useState<IConversation[]>([]);
   const [currentSessionId, setCurrentSessionId] = useState<string>("");
   const [userInput, setUserInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -44,6 +50,7 @@ const ChatPage = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [streamingText, setStreamingText] = useState<string>("");
 
+  // Filter out sessions that start with "session-" or are empty
   const filteredSessions = sessions.filter(
     (session) => !session.id.startsWith("session-") && session.id !== ""
   );
@@ -53,18 +60,18 @@ const ChatPage = () => {
   );
   const messages = currentSession ? currentSession.messages : [];
 
-  const scrollToBottom = () => {
+  const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
+  }, []);
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, streamingText]);
+  }, [messages, streamingText, scrollToBottom]);
 
   const handleSendMessage = async () => {
     if (!userInput.trim() && !image) return;
 
-    const userMessage = {
+    const userMessage: IMessage = {
       id: Date.now(),
       sender: "user",
       text: userInput,
@@ -79,6 +86,7 @@ const ChatPage = () => {
     setImagePreview(null);
     setImage(null);
     setLoading(true);
+    setStreamingText("");
 
     try {
       const response = await agentChat({
@@ -87,16 +95,11 @@ const ChatPage = () => {
         image: image,
       });
 
-      setStreamingText("");
-      for (let i = 0; i < response.question.length; i++) {
-        setStreamingText((prev) => prev + response.question[i]);
-        await new Promise((resolve) => setTimeout(resolve, 10));
-      }
-
-      const botMessage = {
-        id: Date.now() + 1,
+      const botMessageId = Date.now() + 1;
+      const botMessage: IMessage = {
+        id: botMessageId,
         sender: "bot",
-        text: response.question,
+        text: "",
         time: getCurrentTime(),
         image: null,
       };
@@ -106,8 +109,20 @@ const ChatPage = () => {
         botMessage,
       ]);
       setCurrentSessionId(response.session_id);
+
+      for (let i = 0; i < response.question.length; i++) {
+        botMessage.text += response.question[i];
+        updateSessionMessages(response.session_id, [
+          ...updatedMessages,
+          { ...botMessage },
+        ]);
+        await new Promise((resolve) => setTimeout(resolve, 10));
+      }
+
+      await handleSaveConversation();
     } catch (error) {
-      const errorMessage = {
+      console.error("Error sending message:", error);
+      const errorMessage: IMessage = {
         id: Date.now() + 2,
         sender: "bot",
         text: "Oops! Something went wrong. Please try again.",
@@ -120,29 +135,28 @@ const ChatPage = () => {
       ]);
     } finally {
       setLoading(false);
-      setStreamingText("");
     }
   };
 
-  const updateSessionMessages = (
-    sessionId: string,
-    newMessages: IMessage[]
-  ) => {
-    setSessions((prevSessions) => {
-      const sessionIndex = prevSessions.findIndex(
-        (session) => session.id === sessionId
-      );
-      if (sessionIndex >= 0) {
-        const updatedSessions = [...prevSessions];
-        updatedSessions[sessionIndex].messages = newMessages;
-        return updatedSessions;
-      } else {
-        return [...prevSessions, { id: sessionId, messages: newMessages }];
-      }
-    });
-  };
+  const updateSessionMessages = useCallback(
+    (sessionId: string, newMessages: IMessage[]) => {
+      setSessions((prevSessions) => {
+        const sessionIndex = prevSessions.findIndex(
+          (session) => session.id === sessionId
+        );
+        if (sessionIndex >= 0) {
+          const updatedSessions = [...prevSessions];
+          updatedSessions[sessionIndex].messages = newMessages;
+          return updatedSessions;
+        } else {
+          return [...prevSessions, { id: sessionId, messages: newMessages }];
+        }
+      });
+    },
+    []
+  );
 
-  const handleNewConversation = () => {
+  const handleNewConversation = useCallback(() => {
     const newSessionId = `session-${Date.now()}`;
     setCurrentSessionId(newSessionId);
     updateSessionMessages(newSessionId, [
@@ -155,27 +169,17 @@ const ChatPage = () => {
       },
     ]);
     setIsSidebarOpen(false);
-  };
-
-  const handleCategoryClick = (category: string) => {
-    const newSessionId = `session-${Date.now()}`;
-    setCurrentSessionId(newSessionId);
-    updateSessionMessages(newSessionId, [
-      {
-        id: 1,
-        sender: "bot",
-        text: `Hello! How can I assist you with ${category} today?`,
-        time: getCurrentTime(),
-        image: null,
-      },
-    ]);
-    setIsSidebarOpen(false);
-  };
+  }, [updateSessionMessages]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      setImage(e.target.files[0]);
-      setImagePreview(URL.createObjectURL(e.target.files[0]));
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      if (file.size > 5 * 1024 * 1024) {
+        alert("Image size must be less than 5MB.");
+        return;
+      }
+      setImage(file);
+      setImagePreview(URL.createObjectURL(file));
       setUserInput("What's in the image?");
     }
   };
@@ -185,21 +189,30 @@ const ChatPage = () => {
     setImagePreview(null);
   };
 
+  const handleSaveConversation = async () => {
+    if (!user?.emailAddresses[0]?.emailAddress || !currentSession) return;
+
+    const conversationRequest: IConversationRequest = {
+      user_email: user.emailAddresses[0].emailAddress,
+      conversations: [currentSession],
+    };
+
+    try {
+      await saveConversations(conversationRequest);
+    } catch (error) {
+      console.error("Failed to save conversation:", error);
+    }
+  };
+
   return (
     <div className="flex flex-col sm:flex-row h-full bg-gray-50">
       {/* Sidebar */}
-      <button
-        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-        className="sm:hidden p-4 bg-[hsl(var(--laai-blue))] hover:bg-[hsl(var(--laai-blue-dark))] text-white transition-colors rounded-md"
-      >
-        {isSidebarOpen ? "Close" : "Chat History"}
-      </button>
-
       <div
         className={`fixed sm:static z-40 h-full sm:h-auto bg-white border-r shadow-lg flex flex-col transform ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         } transition-transform duration-300 sm:translate-x-0 w-64`}
       >
+        {/* Sidebar Content */}
         <div className="flex items-center justify-start ml-4">
           <Image
             src="/images/logo.png"
@@ -213,18 +226,7 @@ const ChatPage = () => {
           </h3>
         </div>
 
-        <div className="flex items-center justify-center space-x-3 px-4 py-2 bg-gray-50 border-b">
-          {["Science", "Maths", "History"].map((category) => (
-            <Button
-              key={category}
-              className="bg-gray-100 text-gray-800 hover:bg-blue-500 hover:text-white px-4 py-1 rounded-lg shadow-sm"
-              onClick={() => handleCategoryClick(category)}
-            >
-              {category}
-            </Button>
-          ))}
-        </div>
-
+        {/* Chat History */}
         <ScrollArea className="flex-1 p-3 space-y-2">
           {filteredSessions.length === 0 ? (
             <p className="text-sm text-gray-500 text-center">
@@ -253,6 +255,7 @@ const ChatPage = () => {
           )}
         </ScrollArea>
 
+        {/* New Conversation Button */}
         <div className="p-4 bg-gray-50 border-t">
           <Button
             onClick={handleNewConversation}
@@ -266,6 +269,7 @@ const ChatPage = () => {
       {/* Chat Interface */}
       <div className="flex flex-col flex-1 sm:my-0 sm:mx-0 sm:p-2 lg:p-2">
         <ScrollArea className="flex-1 px-2 space-y-2 py-4">
+          {/* Messages */}
           {messages.map((message) => (
             <div
               key={message.id}
@@ -278,7 +282,7 @@ const ChatPage = () => {
                   <AvatarImage
                     src="/images/BotAvatar.svg"
                     alt="Bot"
-                    className="w-8 h-8 object-cover"
+                    className="w-8 h-8 object-cover animate-pulse"
                   />
                   <AvatarFallback>🤖</AvatarFallback>
                 </Avatar>
@@ -334,26 +338,6 @@ const ChatPage = () => {
               )}
             </div>
           ))}
-
-          {/* Streaming Effect */}
-          {loading && (
-            <div className="flex w-full items-start">
-              <Avatar className="mr-2">
-                <AvatarImage
-                  src="/images/BotAvatar.svg"
-                  alt="Bot"
-                  className="w-8 h-8 object-cover"
-                />
-                <AvatarFallback>🤖</AvatarFallback>
-              </Avatar>
-              <div className="flex flex-col max-w-md mb-8">
-                <Card className="px-4 py-2 shadow-lg bg-gradient-to-r from-gray-200 to-gray-100 text-gray-800 rounded-3xl rounded-bl-sm mr-2">
-                  {streamingText || "Thinking..."}
-                </Card>
-              </div>
-            </div>
-          )}
-
           <div ref={messagesEndRef} />
         </ScrollArea>
 
@@ -441,24 +425,30 @@ const ChatPage = () => {
             <div className="flex items-center justify-between">
               <Button
                 onClick={handleSendMessage}
-                className={`flex items-center space-x-4 px-4 py-2 rounded-lg shadow-md ${
-                  loading
-                    ? "bg-gray-400 text-gray-800 cursor-not-allowed"
-                    : "bg-[hsl(var(--laai-blue))] hover:bg-[hsl(var(--laai-blue-dark))] text-white transition-colors"
-                }`}
+                className={`flex items-center space-x-4 px-4 py-2 rounded-lg shadow-md ${"bg-[hsl(var(--laai-blue))] hover:bg-[hsl(var(--laai-blue-dark))] text-white transition-colors"}`}
                 disabled={loading}
                 aria-label="Send message"
               >
-                <div className="relative w-5 h-5">
-                  <Image
-                    src="/images/Send.svg"
-                    alt="Send"
-                    fill
-                    className="w-full h-full object-contain"
-                  />
+                <div className="relative w-6 h-6">
+                  {loading ? (
+                    <Image
+                      src="/images/logo.png"
+                      alt="LAAI"
+                      width={60}
+                      height={60}
+                      className="animate-pulse"
+                    />
+                  ) : (
+                    <Image
+                      src="/images/Send.svg"
+                      alt="Send"
+                      fill
+                      className="w-40 h-40 object-contain"
+                    />
+                  )}
                 </div>
                 <span className="hidden md:inline">
-                  {loading ? "Sending..." : "Send message"}
+                  {loading ? "Analyzing ..." : "Send message"}
                 </span>
               </Button>
             </div>
