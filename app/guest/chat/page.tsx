@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
@@ -12,6 +14,7 @@ import {
 } from "@/src/components/ui/avatar";
 import { Textarea } from "@/src/components/ui/textarea";
 import { agentChat } from "@/src/services/socraticServices";
+import { useUser } from "@clerk/nextjs";
 
 const getCurrentTime = () =>
   new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
@@ -30,6 +33,7 @@ interface ISession {
 }
 
 const ChatPage = () => {
+  const { user } = useUser();
   const [sessions, setSessions] = useState<ISession[]>([]);
   const [currentSessionId, setCurrentSessionId] = useState<string>("");
   const [userInput, setUserInput] = useState("");
@@ -304,11 +308,19 @@ const ChatPage = () => {
 
               {message.sender === "user" && (
                 <Avatar className="ml-2">
-                  <AvatarImage
-                    src="/images/userAvatar.svg"
-                    alt="User"
-                    className="w-8 h-8 object-cover"
-                  />
+                  {user?.imageUrl ? (
+                    <img
+                      src={user?.imageUrl}
+                      alt="User Profile"
+                      className="w-8 h-8 rounded-full object-cover"
+                    />
+                  ) : (
+                    <AvatarImage
+                      src="/images/userAvatar.svg"
+                      alt="User"
+                      className="w-8 h-8 object-cover"
+                    />
+                  )}
                 </Avatar>
               )}
             </div>
