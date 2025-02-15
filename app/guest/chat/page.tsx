@@ -200,9 +200,18 @@ const ChatPage = () => {
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         } transition-transform duration-300 sm:translate-x-0 w-64`}
       >
-        <h3 className="text-lg font-semibold p-4 border-b bg-gray-50 text-gray-800">
-          Chat History
-        </h3>
+        <div className="flex items-center justify-start ml-4">
+          <Image
+            src="/images/logo.png"
+            alt="LAAI"
+            width={40}
+            height={40}
+            className="animate-pulse"
+          />
+          <h3 className="text-lg font-semibold p-4 text-gray-800">
+            Chat History
+          </h3>
+        </div>
 
         <div className="flex items-center justify-center space-x-3 px-4 py-2 bg-gray-50 border-b">
           {["Science", "Maths", "History"].map((category) => (
