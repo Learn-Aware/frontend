@@ -3,8 +3,8 @@
 import { useUser, SignInButton } from "@clerk/nextjs";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import LAAILoading from "@/components/common/LAAILoading";
+import { Button } from "@/src/components/ui";
+import LAAILoading from "@/src/components/common/LAAILoading";
 
 export default function Home() {
   const { user, isLoaded } = useUser();

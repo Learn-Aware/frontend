@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { Card, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardTitle } from "@/src/components/ui/card";
+import { Button } from "@/src/components/ui/button";
 import { Key, BarChart, Trash, Eye, EyeOff } from "lucide-react";
 import {
   Dialog,
@@ -10,8 +10,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { DialogCloseButton } from "@/components/ui/customDialog";
+} from "@/src/components/ui/dialog";
+import { DialogCloseButton } from "@/src/components/ui/customDialog";
 
 const DashboardPage = () => {
   const MAX_API_KEYS = 3;

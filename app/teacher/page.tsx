@@ -1,6 +1,6 @@
 "use client";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card } from "@/src/components/ui/card";
+import { Button } from "@/src/components/ui/button";
 import { Users, Clock, BookOpen, MessageSquare } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
 

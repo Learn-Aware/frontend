@@ -13,9 +13,9 @@ import {
   Menu,
   X,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/src/components/ui/button";
 import { useState } from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/src/lib/utils";
 import { useUser } from "@clerk/nextjs";
 import LogOutComponent from "../common/LogOutComponent";
 

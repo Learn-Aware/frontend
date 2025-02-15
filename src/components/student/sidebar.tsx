@@ -2,18 +2,31 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Home, Settings, User, Menu, X, Key } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import {
+  BookOpen,
+  Calendar,
+  GraduationCap,
+  Home,
+  MessageSquare,
+  Settings,
+  User,
+  Menu,
+  X,
+} from "lucide-react";
+import { Button } from "@/src/components/ui/button";
 import { useState } from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/src/lib/utils";
 import { useUser } from "@clerk/nextjs";
 import LogOutComponent from "../common/LogOutComponent";
 
 const menuItems = [
-  { label: "Dashboard", href: "/api", icon: Home },
-  { label: "Generate Key", href: "/api/generate-key", icon: Key },
-  { label: "Settings", href: "/api/settings", icon: Settings },
-  { label: "Profile", href: "/api/profile", icon: User },
+  { icon: Home, label: "Dashboard", href: "/student" },
+  { icon: BookOpen, label: "Courses", href: "/student/courses" },
+  { icon: MessageSquare, label: "Chat", href: "/student/chat" },
+  { icon: Calendar, label: "Schedule", href: "/student/schedule" },
+  { icon: GraduationCap, label: "Progress", href: "/student/progress" },
+  { icon: User, label: "Profile", href: "/student/profile" },
+  { icon: Settings, label: "Settings", href: "/student/settings" },
 ];
 
 export function Sidebar() {

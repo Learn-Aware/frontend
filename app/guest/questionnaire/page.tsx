@@ -1,14 +1,14 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { questions } from "@/data/questions";
+import { questions } from "@/src/data/questions";
 import {
   Card,
   CardContent,
   CardTitle,
   CardHeader,
   Button,
-} from "@/components/ui";
+} from "@/src/components/ui";
 import InitialView from "./components/InitialView";
 import LearningStyleRadar from "./components/LearningStyleRadar";
 import { useRouter } from "next/navigation";

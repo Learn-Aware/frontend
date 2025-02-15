@@ -1,23 +1,23 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
+import { Button } from "@/src/components/ui/button";
+import { Input } from "@/src/components/ui/input";
+import { Card, CardContent } from "@/src/components/ui/card";
+import { Textarea } from "@/src/components/ui/textarea";
+import { Label } from "@/src/components/ui/label";
 import {
   Select,
   SelectTrigger,
   SelectContent,
   SelectItem,
   SelectValue,
-} from "@/components/ui/select";
+} from "@/src/components/ui/select";
 import {
   askQuestionFromDocument,
   uploadFilesToServer,
-} from "../../../services/cagServices";
-import { ScrollArea } from "@/components/ui/scroll-area";
+} from "@/src/services/cagServices";
+import { ScrollArea } from "@/src/components/ui/scroll-area";
 
 const DocumentAI = () => {
   const [files, setFiles] = useState<FileList | null>(null);
