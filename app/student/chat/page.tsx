@@ -86,6 +86,7 @@ const ChatPage = () => {
     setImagePreview(null);
     setImage(null);
     setLoading(true);
+    setStreamingText("");
 
     try {
       const response = await agentChat({
@@ -94,16 +95,11 @@ const ChatPage = () => {
         image: image,
       });
 
-      setStreamingText("");
-      for (let i = 0; i < response.question.length; i++) {
-        setStreamingText((prev) => prev + response.question[i]);
-        await new Promise((resolve) => setTimeout(resolve, 10));
-      }
-
+      const botMessageId = Date.now() + 1;
       const botMessage: IMessage = {
-        id: Date.now() + 1,
+        id: botMessageId,
         sender: "bot",
-        text: response.question,
+        text: "",
         time: getCurrentTime(),
         image: null,
       };
@@ -113,6 +109,15 @@ const ChatPage = () => {
         botMessage,
       ]);
       setCurrentSessionId(response.session_id);
+
+      for (let i = 0; i < response.question.length; i++) {
+        botMessage.text += response.question[i];
+        updateSessionMessages(response.session_id, [
+          ...updatedMessages,
+          { ...botMessage },
+        ]);
+        await new Promise((resolve) => setTimeout(resolve, 10));
+      }
 
       await handleSaveConversation();
     } catch (error) {
@@ -130,7 +135,6 @@ const ChatPage = () => {
       ]);
     } finally {
       setLoading(false);
-      setStreamingText("");
     }
   };
 
