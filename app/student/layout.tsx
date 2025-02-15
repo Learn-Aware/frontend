@@ -1,4 +1,4 @@
-import { Sidebar } from "@/components/student/sidebar";
+import { Sidebar } from "@/src/components/student/sidebar";
 
 export default function DashboardLayout({
   children,

@@ -1,6 +1,6 @@
 "use client";
 
-import { CardHeader, CardTitle } from "@/components/ui";
+import { CardHeader, CardTitle } from "@/src/components/ui";
 import {
   ResponsiveContainer,
   RadarChart,

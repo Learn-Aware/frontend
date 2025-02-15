@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/src/components/ui/button";
 import Image from "next/image";
 
 const ImageUpload = () => {
@@ -29,9 +29,7 @@ const ImageUpload = () => {
         id="image-upload"
       />
       <label htmlFor="image-upload">
-        <Button
-          className="px-4 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white"
-        >
+        <Button className="px-4 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white">
           Choose Image
         </Button>
       </label>

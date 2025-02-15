@@ -1,7 +1,7 @@
 import React from "react";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
-import { CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/src/components/ui/button";
+import { CardHeader, CardTitle } from "@/src/components/ui/card";
 
 const InitialView = ({ handleStartQuiz }: { handleStartQuiz: () => void }) => {
   return (

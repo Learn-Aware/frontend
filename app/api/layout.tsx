@@ -1,4 +1,4 @@
-import { Sidebar } from "@/components/api/sidebar";
+import { Sidebar } from "@/src/components/api/sidebar";
 
 export default function GenerateKeyDashboardLayout({
   children,

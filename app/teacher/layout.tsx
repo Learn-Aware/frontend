@@ -1,4 +1,4 @@
-import { Sidebar } from "@/components/teacher/sidebar";
+import { Sidebar } from "@/src/components/teacher/sidebar";
 
 export default function TeacherDashboardLayout({
   children,
@@ -13,4 +13,4 @@ export default function TeacherDashboardLayout({
       </main>
     </div>
   );
-} 
+}
