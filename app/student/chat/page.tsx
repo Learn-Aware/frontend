@@ -282,7 +282,7 @@ const ChatPage = () => {
                   <AvatarImage
                     src="/images/BotAvatar.svg"
                     alt="Bot"
-                    className="w-8 h-8 object-cover"
+                    className="w-8 h-8 object-cover animate-pulse"
                   />
                   <AvatarFallback>🤖</AvatarFallback>
                 </Avatar>
@@ -338,26 +338,6 @@ const ChatPage = () => {
               )}
             </div>
           ))}
-
-          {/* Streaming Effect */}
-          {loading && (
-            <div className="flex w-full items-start">
-              <Avatar className="mr-2">
-                <AvatarImage
-                  src="/images/BotAvatar.svg"
-                  alt="Bot"
-                  className="w-8 h-8 object-cover"
-                />
-                <AvatarFallback>🤖</AvatarFallback>
-              </Avatar>
-              <div className="flex flex-col max-w-md mb-8">
-                <Card className="px-4 py-2 shadow-lg bg-gradient-to-r from-gray-200 to-gray-100 text-gray-800 rounded-3xl rounded-bl-sm mr-2">
-                  {streamingText || "Thinking..."}
-                </Card>
-              </div>
-            </div>
-          )}
-
           <div ref={messagesEndRef} />
         </ScrollArea>
 
@@ -445,24 +425,30 @@ const ChatPage = () => {
             <div className="flex items-center justify-between">
               <Button
                 onClick={handleSendMessage}
-                className={`flex items-center space-x-4 px-4 py-2 rounded-lg shadow-md ${
-                  loading
-                    ? "bg-gray-400 text-gray-800 cursor-not-allowed"
-                    : "bg-[hsl(var(--laai-blue))] hover:bg-[hsl(var(--laai-blue-dark))] text-white transition-colors"
-                }`}
+                className={`flex items-center space-x-4 px-4 py-2 rounded-lg shadow-md ${"bg-[hsl(var(--laai-blue))] hover:bg-[hsl(var(--laai-blue-dark))] text-white transition-colors"}`}
                 disabled={loading}
                 aria-label="Send message"
               >
-                <div className="relative w-5 h-5">
-                  <Image
-                    src="/images/Send.svg"
-                    alt="Send"
-                    fill
-                    className="w-full h-full object-contain"
-                  />
+                <div className="relative w-6 h-6">
+                  {loading ? (
+                    <Image
+                      src="/images/logo.png"
+                      alt="LAAI"
+                      width={60}
+                      height={60}
+                      className="animate-pulse"
+                    />
+                  ) : (
+                    <Image
+                      src="/images/Send.svg"
+                      alt="Send"
+                      fill
+                      className="w-40 h-40 object-contain"
+                    />
+                  )}
                 </div>
                 <span className="hidden md:inline">
-                  {loading ? "Sending..." : "Send message"}
+                  {loading ? "Analyzing ..." : "Send message"}
                 </span>
               </Button>
             </div>
