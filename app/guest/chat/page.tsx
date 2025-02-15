@@ -361,7 +361,7 @@ const ChatPage = () => {
         <div className="flex flex-col px-4 py-3 bg-gray-50 border border-gray-200 shadow-md rounded-2xl space-y-4">
           <Textarea
             placeholder="Type your message here..."
-            className="w-full border-none p-4 focus:ring-2 focus:ring-blue-500 rounded-lg"
+            className="w-full border-none p-2 focus:ring-2 focus:ring-blue-500 rounded-lg"
             value={userInput}
             onChange={(e) => setUserInput(e.target.value)}
             disabled={loading}
