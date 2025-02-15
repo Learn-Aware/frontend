@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card, CardTitle } from "@/src/components/ui/card";
 import { Button } from "@/src/components/ui/button";
 import { Key, BarChart, Trash, Eye, EyeOff } from "lucide-react";
@@ -75,6 +75,11 @@ const DashboardPage = () => {
     updatedShowApiKeys[index] = !updatedShowApiKeys[index];
     setShowApiKeys(updatedShowApiKeys);
   };
+
+  useEffect(() => {
+    const used = apiKeys.reduce((acc, curr) => acc + curr.usage, 0);
+    setApiUsage({ used, limit: 1000 });
+  }, [apiKeys]);
 
   return (
     <Card className="flex flex-col items-center justify-start min-h-screen p-4 gap-1">
