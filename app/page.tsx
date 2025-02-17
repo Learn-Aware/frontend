@@ -16,9 +16,9 @@ export default function Home() {
     if (user) {
       const registerRequest: IRegisterRequest = {
         email: user.emailAddresses[0].emailAddress,
-        first_name: user.firstName || "User",
-        last_name: user.lastName || "User",
-        profile_image: user.imageUrl || "",
+        first_name: user.firstName || "First Name",
+        last_name: user.lastName || "Last Name",
+        profile_image: user.imageUrl || "Profile Image",
       };
       registerUser(registerRequest);
     }
@@ -47,9 +47,10 @@ export default function Home() {
               LAAI offers a seamless platform for education and growth.
             </p>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {["guest", "student", "api"].map((role) => (
+          <div className="grid grid-cols-1 md:grid-cols-1 gap-8">
+            {/*<div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+             {["guest", "student", "api"].map((role) => ( NOTE : NEED TO REMOVE THIS LINE */}
+            {["student"].map((role) => (
               <div
                 key={role}
                 className="rounded-lg border bg-card/80 backdrop-blur-sm text-card-foreground shadow-sm h-[320px] max-w-[280px] mx-auto w-full"
