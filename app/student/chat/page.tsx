@@ -16,6 +16,8 @@ import { Textarea } from "@/src/components/ui/textarea";
 import { agentChat } from "@/src/services/socraticServices";
 import { useUser } from "@clerk/nextjs";
 import { saveConversations } from "@/src/services/conversationService";
+import { Drawer } from "@/src/components/ui/drawer";
+import { List, MessageSquare } from "lucide-react";
 
 const getCurrentTime = () =>
   new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
@@ -208,9 +210,9 @@ const ChatPage = () => {
     <div className="flex flex-col sm:flex-row h-full bg-gray-50">
       {/* Sidebar */}
       <div
-        className={`fixed sm:static z-40 h-full sm:h-auto bg-white border-r shadow-lg flex flex-col transform ${
+        className={`fixed sm:static z-40 h-screen sm:h-auto bg-white border-r shadow-lg flex flex-col transform ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } transition-transform duration-300 sm:translate-x-0 w-64`}
+        } transition-transform duration-300 sm:translate-x-0 w-64 hidden sm:block`}
       >
         {/* Sidebar Content */}
         <div className="flex items-center justify-start ml-4">
@@ -255,8 +257,8 @@ const ChatPage = () => {
           )}
         </ScrollArea>
 
-        {/* New Conversation Button */}
-        <div className="p-4 bg-gray-50 border-t">
+        {/* New Conversation Button (Fixed to Bottom) */}
+        <div className="p-4 bg-gray-50 border-t mt-auto">
           <Button
             onClick={handleNewConversation}
             className="w-full bg-[hsl(var(--laai-blue))] hover:bg-[hsl(var(--laai-blue-dark))] text-white transition-colors rounded-lg"
@@ -342,7 +344,7 @@ const ChatPage = () => {
         </ScrollArea>
 
         {/* Input Area */}
-        <div className="flex flex-col px-4 py-3 bg-gray-50 border border-gray-200 shadow-md rounded-2xl space-y-4">
+        <div className="flex flex-col px-4 py-3 bg-gray-50 border border-gray-200 shadow-md rounded-2xl space-y-4 sm:px-6 sm:py-4 md:px-8 md:py-5 lg:px-10 lg:py-6">
           <Textarea
             placeholder="Type your message here..."
             className="w-full border-none p-2 focus:ring-2 focus:ring-blue-500 rounded-lg"
