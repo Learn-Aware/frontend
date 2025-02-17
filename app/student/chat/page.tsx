@@ -16,6 +16,8 @@ import { Textarea } from "@/src/components/ui/textarea";
 import { agentChat } from "@/src/services/socraticServices";
 import { useUser } from "@clerk/nextjs";
 import { saveConversations } from "@/src/services/conversationService";
+import { Drawer } from "@/src/components/ui/drawer";
+import { List, MessageSquare } from "lucide-react";
 
 const getCurrentTime = () =>
   new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
@@ -208,9 +210,9 @@ const ChatPage = () => {
     <div className="flex flex-col sm:flex-row h-full bg-gray-50">
       {/* Sidebar */}
       <div
-        className={`fixed sm:static z-40 h-full sm:h-auto bg-white border-r shadow-lg flex flex-col transform ${
+        className={`fixed sm:static z-40 h-screen sm:h-auto bg-white border-r shadow-lg flex flex-col transform ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } transition-transform duration-300 sm:translate-x-0 w-64`}
+        } transition-transform duration-300 sm:translate-x-0 w-64 hidden sm:block`}
       >
         {/* Sidebar Content */}
         <div className="flex items-center justify-start ml-4">
@@ -255,8 +257,8 @@ const ChatPage = () => {
           )}
         </ScrollArea>
 
-        {/* New Conversation Button */}
-        <div className="p-4 bg-gray-50 border-t">
+        {/* New Conversation Button (Fixed to Bottom) */}
+        <div className="p-4 bg-gray-50 border-t mt-auto">
           <Button
             onClick={handleNewConversation}
             className="w-full bg-[hsl(var(--laai-blue))] hover:bg-[hsl(var(--laai-blue-dark))] text-white transition-colors rounded-lg"
@@ -342,10 +344,11 @@ const ChatPage = () => {
         </ScrollArea>
 
         {/* Input Area */}
-        <div className="flex flex-col px-4 py-3 bg-gray-50 border border-gray-200 shadow-md rounded-2xl space-y-4">
+        <div className="flex flex-col px-4 pt-4 pb-3 bg-white border border-gray-100 rounded-2xl shadow-lg space-y-2">
+          {/* Message Input */}
           <Textarea
             placeholder="Type your message here..."
-            className="w-full border-none p-2 focus:ring-2 focus:ring-blue-500 rounded-lg"
+            className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none"
             value={userInput}
             onChange={(e) => setUserInput(e.target.value)}
             disabled={loading}
@@ -353,18 +356,20 @@ const ChatPage = () => {
             onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
           />
 
+          {/* Image Preview */}
           {imagePreview && (
             <div className="relative">
               <Image
                 src={imagePreview}
                 alt="Preview"
-                className="mt-2 max-w-xs rounded-lg"
+                className="mt-2 max-w-xs rounded-lg shadow-sm"
                 width={200}
                 height={200}
               />
               <button
                 onClick={handleRemoveImage}
-                className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md hover:bg-gray-100"
+                className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md hover:bg-gray-50 transition-colors"
+                aria-label="Remove image"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -382,76 +387,85 @@ const ChatPage = () => {
             </div>
           )}
 
-          {/* Image Upload */}
+          {/* Action Buttons */}
           <div className="flex items-center justify-between">
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-              disabled={loading}
-              className="hidden"
-              id="image-upload"
-            />
-            <div className="flex items-center space-x-4">
-              <label htmlFor="image-upload">
-                <button
-                  onClick={() =>
-                    document.getElementById("image-upload")?.click()
-                  }
-                  className="relative w-5 h-5 rounded-full flex items-center justify-center transition-all duration-200 hover:bg-gray-200 active:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-300"
-                >
-                  <Image
-                    src="/images/Paperclip.svg"
-                    alt="Attach Image"
-                    fill
-                    className="w-full h-full object-contain"
-                  />
-                </button>
+            {/* File Upload and Icons */}
+            <div className="flex items-center space-x-2">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                disabled={loading}
+                className="hidden"
+                id="image-upload"
+              />
+              <label
+                htmlFor="image-upload"
+                className="cursor-pointer p-1.5 rounded-full hover:bg-gray-100 transition-colors"
+                aria-label="Attach image"
+              >
+                <Image
+                  src="/images/Paperclip.svg"
+                  alt="Attach Image"
+                  width={16}
+                  height={16}
+                  className="w-4 h-4"
+                />
               </label>
+
+              {/* Additional Icons */}
               {["Grid", "Microphone", "Element"].map((icon) => (
                 <button
                   key={icon}
-                  className="relative w-5 h-5 rounded-full flex items-center justify-center transition-all duration-200 hover:bg-gray-200 active:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-300"
+                  className="p-1.5 rounded-full hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300"
+                  aria-label={icon}
                 >
                   <Image
                     src={`/images/${icon}.svg`}
                     alt={icon}
-                    fill
-                    className="w-full h-full object-contain"
+                    width={16}
+                    height={16}
+                    className="w-4 h-4"
                   />
                 </button>
               ))}
             </div>
-            <div className="flex items-center justify-between">
-              <Button
-                onClick={handleSendMessage}
-                className={`flex items-center space-x-4 px-4 py-2 rounded-lg shadow-md ${"bg-[hsl(var(--laai-blue))] hover:bg-[hsl(var(--laai-blue-dark))] text-white transition-colors"}`}
-                disabled={loading}
-                aria-label="Send message"
-              >
-                <div className="relative w-6 h-6">
-                  {loading ? (
-                    <Image
-                      src="/images/logo.png"
-                      alt="LAAI"
-                      width={60}
-                      height={60}
-                      className="animate-pulse"
-                    />
-                  ) : (
-                    <Image
-                      src="/images/Send.svg"
-                      alt="Send"
-                      fill
-                      className="w-40 h-40 object-contain"
-                    />
-                  )}
+
+            {/* Send Button */}
+            <Button
+              onClick={handleSendMessage}
+              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-md shadow-sm text-sm text-white ${
+                loading
+                  ? "bg-blue-400 cursor-not-allowed"
+                  : "bg-blue-500 hover:bg-blue-600"
+              } transition-colors`}
+              disabled={loading}
+              aria-label="Send message"
+            >
+              {loading ? (
+                <div className="flex items-center space-x-1.5">
+                  <Image
+                    src="/images/logo.png"
+                    alt="Loading"
+                    width={16}
+                    height={16}
+                    className="w-4 h-4 animate-spin"
+                  />
+                  <span>Analyzing...</span>
                 </div>
-                <span className="hidden md:inline">
-                  {loading ? "Analyzing ..." : "Send message"}
-                </span>
-              </Button>
-            </div>
+              ) : (
+                <>
+                  <Image
+                    src="/images/Send.svg"
+                    alt="Send"
+                    width={16}
+                    height={16}
+                    className="w-4 h-4"
+                  />
+                  <span className="md:inline">Send</span>
+                </>
+              )}
+            </Button>
           </div>
         </div>
       </div>
