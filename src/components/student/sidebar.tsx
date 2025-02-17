@@ -31,7 +31,7 @@ const menuItems = [
 
 export function Sidebar() {
   const { user } = useUser();
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
   const router = useRouter();
 
   return (
