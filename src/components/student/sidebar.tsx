@@ -21,12 +21,12 @@ import LogOutComponent from "../common/LogOutComponent";
 
 const menuItems = [
   { icon: Home, label: "Dashboard", href: "/student" },
-  // { icon: BookOpen, label: "Courses", href: "/student/courses" },
+  { icon: BookOpen, label: "Courses", href: "/student/courses" },
   { icon: MessageSquare, label: "Chat", href: "/student/chat" },
-  // { icon: Calendar, label: "Schedule", href: "/student/schedule" },
-  // { icon: GraduationCap, label: "Progress", href: "/student/progress" },
-  // { icon: User, label: "Profile", href: "/student/profile" },
-  // { icon: Settings, label: "Settings", href: "/student/settings" },
+  { icon: Calendar, label: "Schedule", href: "/student/schedule" },
+  { icon: GraduationCap, label: "Progress", href: "/student/progress" },
+  { icon: User, label: "Profile", href: "/student/profile" },
+  { icon: Settings, label: "Settings", href: "/student/settings" },
 ];
 
 export function Sidebar() {
