@@ -16,8 +16,13 @@ import { Textarea } from "@/src/components/ui/textarea";
 import { agentChat } from "@/src/services/socraticServices";
 import { useUser } from "@clerk/nextjs";
 import { saveConversations } from "@/src/services/conversationService";
-import { Drawer } from "@/src/components/ui/drawer";
-import { List, MessageSquare } from "lucide-react";
+import { ListPlus } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/src/components/ui";
 
 const getCurrentTime = () =>
   new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
@@ -226,6 +231,20 @@ const ChatPage = () => {
           <h3 className="text-lg font-semibold p-4 text-gray-800">
             Chat History
           </h3>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={handleNewConversation}
+                  className="p-2 rounded-full hover:bg-gray-100 transition-colors ml-auto mr-2"
+                  aria-label="Add New Conversation"
+                >
+                  <ListPlus className="w-6 h-6" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>Add New Conversation</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
 
         {/* Chat History */}
@@ -256,16 +275,6 @@ const ChatPage = () => {
             ))
           )}
         </ScrollArea>
-
-        {/* New Conversation Button (Fixed to Bottom) */}
-        <div className="p-4 bg-gray-50 border-t mt-auto">
-          <Button
-            onClick={handleNewConversation}
-            className="w-full bg-[hsl(var(--laai-blue))] hover:bg-[hsl(var(--laai-blue-dark))] text-white transition-colors rounded-lg"
-          >
-            Start New Conversation
-          </Button>
-        </div>
       </div>
 
       {/* Chat Interface */}
